@@ -1,0 +1,27 @@
+[
+    { 
+        "code" : "A", 
+        "name" : "Rice and Flour", 
+        "abbr" : "RAF"
+    },
+    { 
+        "code" : "B", 
+        "name" : "Tumeric Powder", 
+        "abbr" : "TP"
+    },
+    { 
+        "code" : "C", 
+        "name" : "Wheat Rava", 
+        "abbr" : "WR"
+    },
+    { 
+        "code" : "D", 
+        "name" : "Cooking Oil", 
+        "abbr" : "CO"
+    },
+    { 
+        "code" : "E", 
+        "name" : "Pink Salt", 
+        "abbr" : "PS"
+    }
+]

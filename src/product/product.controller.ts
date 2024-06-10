@@ -1,4 +1,4 @@
-import { Controller, Get, NotFoundException, Param, Post, Body, Put, Delete, UsePipes } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Post, Body, Put, Delete, UsePipes, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
@@ -16,6 +16,7 @@ import {
   CreateProduct,
   UpdateProduct
 } from './product.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Product')
 @Controller('product')
@@ -24,6 +25,28 @@ export class ProductController {
     private productService: ProductService
   ) {}
 
+
+  /* API for Nest.js inbuilt support for passport.js */
+  @ApiOperation({ description: 'Login User' })
+  @ApiResponse({ status: 200, description: 'Get User Successfually' })
+  @ApiBody({
+    schema: {
+        type: 'object',
+        properties: {
+          userId: { type: 'string' },
+          username: { type: 'string' },
+          password: { type: 'string' }
+        },
+      },
+  })
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  async login(@Body() body) {
+    let newResponse = {
+      body, msg : "User Validated Successfully"
+    }
+    return newResponse /* "User Validated Successfully" */;
+  }
 
   @ApiOperation({ description: 'Create a product' })
   @ApiResponse({ status: 201, description: 'Product created successfually' })
