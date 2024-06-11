@@ -1,4 +1,4 @@
-import { Controller, Get, NotFoundException, Param, Post, Body, Put, Delete, UsePipes, UseGuards } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Post, Body, Put, Delete, UsePipes, UseGuards, UseFilters, ForbiddenException } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
@@ -17,12 +17,15 @@ import {
   UpdateProduct
 } from './product.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { HttpExceptionFilter } from './product.exception';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 
 @ApiTags('Product')
 @Controller('product')
 export class ProductController {
+  authService: any;
   constructor(
-    private productService: ProductService
+    private productService: ProductService,
   ) {}
 
 
@@ -39,13 +42,15 @@ export class ProductController {
         },
       },
   })
-  @UseGuards(AuthGuard('local'))
+  // @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Body() body) {
     let newResponse = {
       body, msg : "User Validated Successfully"
     }
     return newResponse /* "User Validated Successfully" */;
+    // return this.authService.login(body)
   }
 
   @ApiOperation({ description: 'Create a product' })
@@ -68,8 +73,10 @@ export class ProductController {
   @ApiOperation({ description: 'Get all products.' })
   @ApiOkResponse({ description: 'Returns an array of products.' })
   @Get()
+  @UseFilters(new HttpExceptionFilter())
   async findAll(){
     return this.productService.findAll();
+    // throw new ForbiddenException(); /* Use global filters for handling API response */
   }
 
   @ApiOperation({ description: 'Get a product.' })
