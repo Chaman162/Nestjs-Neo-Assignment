@@ -1,4 +1,6 @@
-import { Controller, Get, NotFoundException, Param, Post, Body, Put, Delete, UsePipes, UseGuards, UseFilters, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Post, Body, Put, Delete, UsePipes, UseGuards, UseFilters,
+  ForbiddenException, 
+  UseInterceptors} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
@@ -7,7 +9,8 @@ import {
   ApiResponse,
   ApiParam,
   ApiTags,
-  ApiBody
+  ApiBody,
+  ApiProperty
 } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import {
@@ -19,6 +22,8 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { HttpExceptionFilter } from './product.exception';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { ResponseInterceptor } from 'src/response/response.interceptor';
+import { CustomSwaggerDecorator } from './swagger.decorator';
 
 @ApiTags('Product')
 @Controller('product')
@@ -66,6 +71,7 @@ export class ProductController {
       },
   })
   @Post()
+  @UseInterceptors(ResponseInterceptor)
   async create(@Body() body: CreateProduct) {
     return this.productService.create(body);
   }
@@ -73,7 +79,8 @@ export class ProductController {
   @ApiOperation({ description: 'Get all products.' })
   @ApiOkResponse({ description: 'Returns an array of products.' })
   @Get()
-  @UseFilters(new HttpExceptionFilter())
+  // @UseFilters(new HttpExceptionFilter())
+  @UseInterceptors(ResponseInterceptor)
   async findAll(){
     return this.productService.findAll();
     // throw new ForbiddenException(); /* Use global filters for handling API response */
@@ -101,13 +108,18 @@ export class ProductController {
     return product;
   }
 
-  @ApiOperation({ description: 'Find products by its name.' })
-  @ApiOkResponse({ description: 'Returns an array of product.' })
-  @ApiBadRequestResponse({ description: 'When the name is invalid.' })
-  @ApiParam({
-    name: 'name',
-    type: 'string',
-    description: 'The product name.'
+  // @ApiOperation({ description: 'Find products by its name.' })
+  // @ApiOkResponse({ description: 'Returns an array of product.' })
+  // @ApiBadRequestResponse({ description: 'When the name is invalid.' })
+  // @ApiParam({
+  //   name: 'name',
+  //   type: 'string',
+  //   description: 'The product name.'
+  // })
+  @CustomSwaggerDecorator({
+    security: false,
+    query: [{ name: 'name', description: 'Enter product name', type: String }],
+    response: [{ status: 200, description: 'Success', type: String }],
   })
   @Get('name/:name')
   async findByName(@Param() params: FindByNameParams){

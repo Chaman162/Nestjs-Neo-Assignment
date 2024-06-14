@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './product/product.exception';
 import { WinstonModule } from 'nest-winston';
 import { transports, format } from 'winston';
+import { ResponseInterceptor } from './response/response.interceptor';
 
 
 async function bootstrap() {
@@ -49,7 +50,8 @@ async function bootstrap() {
 
   // Set validation pipe for entire app.
   app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalFilters(new HttpExceptionFilter());
+  // app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   // Configure app host and port.
   const host = process.env.HOST;
